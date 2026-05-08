@@ -91,7 +91,13 @@ Examples:
 
     # Handle --background: re-launch self as detached process
     if args.background:
-        launch_background(args.config)
+        if getattr(sys, 'frozen', False):
+            # If running as a compiled PyInstaller EXE with --noconsole,
+            # it ALREADY runs detached from the terminal. 
+            # Spawning a child process causes PyInstaller temp directory (_MEIxxx) cleanup errors.
+            run_foreground(args.config)
+        else:
+            launch_background(args.config)
         return
 
     # Normal foreground run
@@ -100,6 +106,13 @@ Examples:
 
 def run_foreground(config_path: str = None):
     """Run FlowMonitor in the foreground."""
+    # Always save PID so it can be stopped via --stop
+    app_dir = get_app_dir()
+    pid_file = os.path.join(app_dir, "data", "flowmonitor.pid")
+    os.makedirs(os.path.dirname(pid_file), exist_ok=True)
+    with open(pid_file, "w") as f:
+        f.write(str(os.getpid()))
+
     from flowmonitor.monitor import FlowMonitor
     monitor = FlowMonitor(config_path=config_path)
     monitor.start()
