@@ -18,7 +18,7 @@
         "fps": 4,
         "interval_minutes": 30,
         "max_width": 1280,
-        "delete_screenshots_after": false
+        "delete_screenshots_after": true
     },
     "general": {
         "log_file": "data/flowmonitor.log",

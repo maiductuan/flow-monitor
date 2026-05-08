@@ -181,20 +181,31 @@ def stop_background():
         pid = int(f.read().strip())
 
     try:
-        if sys.platform == "win32":
-            # Windows: use taskkill
-            subprocess.run(
-                ["taskkill", "/F", "/PID", str(pid)],
-                capture_output=True
-            )
-        else:
-            import signal
-            os.kill(pid, signal.SIGTERM)
-
-        os.remove(pid_file)
-        print(f"FlowMonitor (PID: {pid}) stopped successfully.")
-    except ProcessLookupError:
-        os.remove(pid_file)
+        import psutil
+        process = psutil.Process(pid)
+        
+        # Write stop signal file
+        stop_file = os.path.join(app_dir, "data", "stop.cmd")
+        with open(stop_file, "w") as f:
+            f.write("stop")
+            
+        print(f"Sent stop signal to FlowMonitor (PID: {pid}). Waiting for graceful shutdown...")
+        
+        # Wait up to 60 seconds for graceful shutdown (video generation might take time)
+        try:
+            process.wait(timeout=60)
+            print("FlowMonitor stopped gracefully.")
+        except psutil.TimeoutExpired:
+            print("Graceful shutdown timed out. Force killing...")
+            process.kill()
+            print("FlowMonitor force killed.")
+            
+        if os.path.exists(pid_file):
+            os.remove(pid_file)
+            
+    except psutil.NoSuchProcess:
+        if os.path.exists(pid_file):
+            os.remove(pid_file)
         print(f"Process {pid} not found (already stopped). Cleaned up PID file.")
     except Exception as e:
         print(f"Error stopping process {pid}: {e}")

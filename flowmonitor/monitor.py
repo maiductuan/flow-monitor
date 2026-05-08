@@ -82,9 +82,23 @@ class FlowMonitor:
         self.logger.info("All modules started. Running in background...")
         self.logger.info(f"Press Ctrl+C or use hotkey ({self.config['general']['hotkey_stop']}) to stop.")
 
-        # Keep main thread alive
+        # Keep main thread alive and watch for stop signal file
+        stop_file = self.base_dir / "data" / "stop.cmd"
+        if stop_file.exists():
+            try:
+                stop_file.unlink()
+            except OSError:
+                pass
+
         try:
             while self._running and not self._stop_event.is_set():
+                if stop_file.exists():
+                    self.logger.info("Stop command received via file.")
+                    try:
+                        stop_file.unlink()
+                    except OSError:
+                        pass
+                    break
                 self._stop_event.wait(timeout=1)
         except KeyboardInterrupt:
             pass
