@@ -1,0 +1,16 @@
+# Build artifacts
+build/
+dist/
+*.spec.bak
+
+# Runtime data
+data/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# PyInstaller
+*.manifest
+*.log

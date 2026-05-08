@@ -1,0 +1,29 @@
+{
+    "screenshot": {
+        "enabled": true,
+        "interval_seconds": 5,
+        "output_dir": "data/screenshots",
+        "format": "jpg",
+        "quality": 60,
+        "max_files": 1000
+    },
+    "keylogger": {
+        "enabled": true,
+        "output_dir": "data/keylogs",
+        "flush_interval_seconds": 10
+    },
+    "video": {
+        "auto_generate": true,
+        "output_dir": "data/videos",
+        "fps": 4,
+        "interval_minutes": 30,
+        "max_width": 1280,
+        "delete_screenshots_after": false
+    },
+    "general": {
+        "log_file": "data/flowmonitor.log",
+        "run_on_startup": false,
+        "hotkey_stop": "ctrl+shift+q",
+        "minimize_to_tray": true
+    }
+}
